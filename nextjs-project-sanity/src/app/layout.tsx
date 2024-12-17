@@ -15,8 +15,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
+    <html lang="en" suppressHydrationWarning>
+      <body className={inter.className} suppressHydrationWarning>
         <div className="min-h-screen bg-gray-50">
           <header className="bg-white shadow-sm">
             <nav className="container mx-auto px-4 py-4">
@@ -39,7 +39,7 @@ export default function RootLayout({
           <footer className="bg-gray-800 text-white py-8">
             <div className="container mx-auto px-4">
               <div className="text-center">
-                <p>&copy; {new Date().getFullYear()} Travel Tours. All rights reserved.</p>
+                <p>© {new Date().getFullYear()} Travel Tours. All rights reserved.</p>
               </div>
             </div>
           </footer>

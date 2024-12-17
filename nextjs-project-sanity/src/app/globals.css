@@ -2,6 +2,135 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  /* Hero Section */
+  .component-wrapper__triphero {
+    @apply relative;
+  }
+
+  .trip-hero {
+    @apply relative;
+  }
+
+  .trip-hero--layout2 {
+    @apply relative;
+  }
+
+  .trip-hero__gallery {
+    @apply relative;
+  }
+
+  .trip-hero__gallery--layout2 {
+    @apply relative;
+  }
+
+  .trip-hero__info {
+    @apply absolute inset-0 bg-black bg-opacity-40 flex flex-col justify-end;
+  }
+
+  .trip-hero__info--layout2 {
+    @apply pb-8;
+  }
+
+  /* Trip Summary */
+  .trip-summary {
+    @apply space-y-8;
+  }
+
+  .trip-summary__section {
+    @apply space-y-4;
+  }
+
+  .trip-summary__title {
+    @apply text-3xl font-bold text-gray-900;
+  }
+
+  .trip-summary__description {
+    @apply text-gray-600 leading-relaxed;
+  }
+
+  /* Icons with Description */
+  .icon-with-description {
+    @apply flex items-start gap-4;
+  }
+
+  .icon-with-description__icon {
+    @apply w-5 h-5 text-gray-500;
+  }
+
+  .icon-with-description__label {
+    @apply text-xs uppercase tracking-wider text-gray-600;
+  }
+
+  .icon-with-description__title {
+    @apply text-sm text-gray-900;
+  }
+
+  /* Buttons */
+  .btn {
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .btn--primary {
+    @apply bg-red-600 text-white hover:bg-red-700;
+  }
+
+  .btn--secondary {
+    @apply bg-gray-100 text-gray-600 hover:bg-gray-200;
+  }
+
+  /* Tooltips */
+  .tooltip {
+    @apply relative inline-block;
+  }
+
+  .tooltip-text {
+    @apply flex items-center gap-2;
+  }
+
+  /* Group Booking Info */
+  .raq-small-groups {
+    @apply bg-gray-50 p-6 rounded-lg mt-8;
+  }
+
+  .raq-small-groups__title {
+    @apply text-lg font-semibold mb-2;
+  }
+
+  .raq-small-groups__description {
+    @apply text-gray-600 text-sm;
+  }
+
+  /* Trip Code */
+  .trip-hero__trip-code {
+    @apply flex items-center gap-2 mt-4 text-white text-sm;
+  }
+}
+
+/* Rich Text */
+.rich-text p {
+  @apply mb-4 last:mb-0;
+}
+
+.rich-text a {
+  @apply text-red-600 hover:text-red-700;
+}
+
+/* Transitions */
+.custom-transition {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Responsive Images */
+.sized-image {
+  @apply relative w-full h-full;
+}
+
+.sized-image img {
+  @apply object-cover w-full h-full;
+}
+
 :root {
   --foreground-rgb: 0, 0, 0;
   --background-rgb: 245, 245, 245;
