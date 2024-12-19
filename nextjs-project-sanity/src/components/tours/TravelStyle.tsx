@@ -1,7 +1,13 @@
 import { type SanityDocument } from "next-sanity";
 
+interface TripStyle {
+  name: string;
+  description: string;
+  features: string[];
+}
+
 interface TravelStyleProps {
-  travelStyle: SanityDocument['travelStyle'];
+  travelStyle: TripStyle;
 }
 
 export default function TravelStyle({ travelStyle }: TravelStyleProps) {
@@ -12,8 +18,8 @@ export default function TravelStyle({ travelStyle }: TravelStyleProps) {
       <h2 className="text-2xl font-bold mb-4">Travel Style</h2>
       <div className="space-y-4">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900">{travelStyle.name}</h3>
-          <p className="text-gray-600 mt-2">{travelStyle.description}</p>
+          <h3 className="text-lg font-semibold text-gray-900">{travelStyle.name || 'Travel Style'}</h3>
+          <p className="text-gray-600 mt-2">{travelStyle.description || 'No description available'}</p>
         </div>
         
         {travelStyle.features && travelStyle.features.length > 0 && (

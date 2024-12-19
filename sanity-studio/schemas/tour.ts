@@ -4,17 +4,42 @@ export default defineType({
   name: 'tour',
   title: 'Tours',
   type: 'document',
+  groups: [
+    {
+      name: 'basic',
+      title: 'Basic Information',
+    },
+    {
+      name: 'details',
+      title: 'Tour Details',
+    },
+    {
+      name: 'itinerary',
+      title: 'Itinerary',
+    },
+    {
+      name: 'pricing',
+      title: 'Pricing & Dates',
+    },
+    {
+      name: 'media',
+      title: 'Media & Gallery',
+    },
+  ],
   fields: [
+    // Basic Information
     defineField({
       name: 'title',
       title: 'Title',
       type: 'string',
+      group: 'basic',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
       name: 'slug',
       title: 'Slug',
       type: 'slug',
+      group: 'basic',
       options: {
         source: 'title',
         maxLength: 96,
@@ -25,12 +50,150 @@ export default defineType({
       name: 'tripCode',
       title: 'Trip Code',
       type: 'string',
+      group: 'basic',
       validation: (Rule) => Rule.required(),
     }),
     defineField({
-      name: 'price',
-      title: 'Price',
+      name: 'summary',
+      title: 'Summary',
+      type: 'text',
+      group: 'basic',
+      rows: 3,
+      validation: (Rule) => Rule.required(),
+    }),
+    // Media
+    defineField({
+      name: 'mainImage',
+      title: 'Main Image',
+      type: 'image',
+      group: 'media',
+      options: {
+        hotspot: true,
+      },
+      fields: [
+        {
+          name: 'alt',
+          type: 'string',
+          title: 'Alternative Text',
+        }
+      ]
+    }),
+    defineField({
+      name: 'gallery',
+      title: 'Gallery',
+      type: 'array',
+      group: 'media',
+      of: [
+        {
+          type: 'image',
+          options: {
+            hotspot: true,
+          },
+          fields: [
+            {
+              name: 'alt',
+              type: 'string',
+              title: 'Alternative Text',
+            },
+            {
+              name: 'caption',
+              type: 'string',
+              title: 'Caption',
+            }
+          ]
+        }
+      ]
+    }),
+    // Tour Details
+    defineField({
+      name: 'duration',
+      title: 'Duration (Days)',
+      type: 'number',
+      group: 'details',
+      validation: (Rule) => Rule.required().min(1),
+    }),
+    defineField({
+      name: 'startEndCities',
+      title: 'Start/End Cities',
       type: 'object',
+      group: 'details',
+      fields: [
+        {
+          name: 'startCity',
+          title: 'Start City',
+          type: 'string',
+          validation: (Rule) => Rule.required(),
+        },
+        {
+          name: 'endCity',
+          title: 'End City',
+          type: 'string',
+          validation: (Rule) => Rule.required(),
+        }
+      ]
+    }),
+    defineField({
+      name: 'locations',
+      title: 'Locations',
+      type: 'array',
+      group: 'details',
+      of: [{type: 'string'}],
+      validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: 'tripStyle',
+      title: 'Trip Style',
+      type: 'object',
+      group: 'details',
+      fields: [
+        {
+          name: 'name',
+          title: 'Style Name',
+          type: 'string',
+          options: {
+            list: ['Country Explorer', 'Regional Explorer', 'Discovery', 'Family Experience'],
+          },
+        },
+        {
+          name: 'description',
+          title: 'Style Description',
+          type: 'text',
+        },
+        {
+          name: 'features',
+          title: 'Style Features',
+          type: 'array',
+          of: [{type: 'string'}],
+        },
+      ],
+    }),
+    defineField({
+      name: 'activityLevel',
+      title: 'Activity Level',
+      type: 'object',
+      group: 'details',
+      fields: [
+        {
+          name: 'level',
+          title: 'Level',
+          type: 'string',
+          options: {
+            list: ['Leisurely', 'Moderate', 'Dynamic', 'Active'],
+          },
+        },
+        {
+          name: 'description',
+          title: 'Description',
+          type: 'text',
+        }
+      ]
+    }),
+    // Pricing & Dates
+    defineField({
+      name: 'price',
+      title: 'Base Price',
+      type: 'object',
+      group: 'pricing',
       fields: [
         {
           name: 'amount',
@@ -56,91 +219,72 @@ export default defineType({
       ]
     }),
     defineField({
-      name: 'rating',
-      title: 'Rating',
-      type: 'object',
-      fields: [
-        {
-          name: 'score',
-          title: 'Score',
-          type: 'number',
-          validation: (Rule) => Rule.required().min(0).max(5),
-        },
-        {
-          name: 'reviewCount',
-          title: 'Review Count',
-          type: 'number',
-          validation: (Rule) => Rule.required().min(0),
-        }
-      ]
-    }),
-    defineField({
-      name: 'tripStyle',
-      title: 'Trip Style',
-      type: 'string',
-      options: {
-        list: ['Country Explorer', 'Regional Explorer', 'Discovery', 'Family Experience'],
-      },
-      validation: (Rule) => Rule.required(),
-    }),
-    defineField({
-      name: 'mainImage',
-      title: 'Main Image',
-      type: 'image',
-      options: {
-        hotspot: true,
-      },
-      fields: [
-        {
-          name: 'alt',
-          type: 'string',
-          title: 'Alternative Text',
-        }
-      ]
-    }),
-    defineField({
-      name: 'duration',
-      title: 'Duration (Days)',
-      type: 'number',
-      validation: (Rule) => Rule.required().min(1),
-    }),
-    defineField({
-      name: 'startEndCities',
-      title: 'Start/End Cities',
-      type: 'object',
-      fields: [
-        {
-          name: 'startCity',
-          title: 'Start City',
-          type: 'string',
-          validation: (Rule) => Rule.required(),
-        },
-        {
-          name: 'endCity',
-          title: 'End City',
-          type: 'string',
-          validation: (Rule) => Rule.required(),
-        }
-      ]
-    }),
-    defineField({
-      name: 'locations',
-      title: 'Locations',
+      name: 'departureDates',
+      title: 'Departure Dates',
       type: 'array',
-      of: [{type: 'string'}],
-      validation: (Rule) => Rule.required(),
+      group: 'pricing',
+      of: [
+        {
+          type: 'object',
+          fields: [
+            {
+              name: 'date',
+              title: 'Date',
+              type: 'date',
+            },
+            {
+              name: 'price',
+              title: 'Price',
+              type: 'number',
+            },
+            {
+              name: 'availability',
+              title: 'Availability',
+              type: 'string',
+              options: {
+                list: ['Available', 'Almost Full', 'Guaranteed', 'Sold Out'],
+              },
+            },
+            {
+              name: 'discounts',
+              title: 'Discounts',
+              type: 'array',
+              of: [
+                {
+                  type: 'object',
+                  fields: [
+                    {
+                      name: 'type',
+                      title: 'Type',
+                      type: 'string',
+                      options: {
+                        list: ['Early Bird', 'Last Minute', 'Group', 'Special'],
+                      },
+                    },
+                    {
+                      name: 'amount',
+                      title: 'Amount',
+                      type: 'number',
+                    },
+                    {
+                      name: 'description',
+                      title: 'Description',
+                      type: 'string',
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+        },
+      ],
     }),
-    defineField({
-      name: 'summary',
-      title: 'Summary',
-      type: 'text',
-      rows: 3,
-      validation: (Rule) => Rule.required(),
-    }),
+    // Itinerary
     defineField({
       name: 'itinerary',
       title: 'Itinerary',
       type: 'array',
+      group: 'itinerary',
       of: [
         {
           type: 'object',
@@ -164,11 +308,69 @@ export default defineType({
               validation: (Rule) => Rule.required(),
             },
             {
+              name: 'thumbnailImage',
+              title: 'Thumbnail Image',
+              type: 'image',
+              description: 'This image will be shown in the collapsed view (192x128px recommended)',
+              options: {
+                hotspot: true,
+              },
+              fields: [
+                {
+                  name: 'alt',
+                  type: 'string',
+                  title: 'Alternative Text',
+                  description: 'Important for SEO and accessibility',
+                }
+              ],
+              validation: (Rule) => Rule.required(),
+            },
+            {
+              name: 'expandedImage',
+              title: 'Expanded View Image',
+              type: 'image',
+              description: 'This larger image will be shown when the day is expanded',
+              options: {
+                hotspot: true,
+              },
+              fields: [
+                {
+                  name: 'alt',
+                  type: 'string',
+                  title: 'Alternative Text',
+                  description: 'Important for SEO and accessibility',
+                }
+              ]
+            },
+            {
               name: 'locations',
               title: 'Locations',
               type: 'array',
               of: [{type: 'string'}],
               validation: (Rule) => Rule.required(),
+            },
+            {
+              name: 'tags',
+              title: 'Tags',
+              type: 'array',
+              description: 'Add tags like "Arrival Transfer", "Welcome", etc.',
+              of: [{type: 'string'}],
+              options: {
+                layout: 'tags'
+              }
+            },
+            {
+              name: 'specialFeature',
+              title: 'Special Feature',
+              type: 'string',
+              description: 'Special feature badge like "Trafalgar Difference"',
+              options: {
+                list: [
+                  {title: 'Trafalgar Difference', value: 'Trafalgar Difference'},
+                  {title: 'Be My Guest', value: 'Be My Guest'},
+                  {title: 'Cultural Insight', value: 'Cultural Insight'},
+                ]
+              }
             },
             {
               name: 'meals',
@@ -193,13 +395,18 @@ export default defineType({
                       title: 'Type',
                       type: 'string',
                       options: {
-                        list: ['sightseeing', 'dining', 'cultural', 'leisure'],
+                        list: ['Sightseeing', 'Dining', 'Cultural', 'Leisure', 'Transfer'],
                       }
                     },
                     {
                       name: 'description',
                       title: 'Description',
                       type: 'string',
+                    },
+                    {
+                      name: 'duration',
+                      title: 'Duration (hours)',
+                      type: 'number',
                     }
                   ]
                 }
@@ -227,6 +434,11 @@ export default defineType({
                       name: 'price',
                       title: 'Price',
                       type: 'number',
+                    },
+                    {
+                      name: 'duration',
+                      title: 'Duration (hours)',
+                      type: 'number',
                     }
                   ]
                 }
@@ -237,174 +449,7 @@ export default defineType({
       ],
       validation: (Rule) => Rule.required(),
     }),
-    defineField({
-      name: 'mapPoints',
-      title: 'Map Points',
-      type: 'array',
-      of: [
-        {
-          type: 'object',
-          fields: [
-            {
-              name: 'city',
-              title: 'City',
-              type: 'string',
-            },
-            {
-              name: 'coordinates',
-              title: 'Coordinates',
-              type: 'object',
-              fields: [
-                {name: 'lat', title: 'Latitude', type: 'number'},
-                {name: 'lng', title: 'Longitude', type: 'number'},
-              ]
-            },
-            {
-              name: 'stayType',
-              title: 'Stay Type',
-              type: 'string',
-              options: {
-                list: ['overnight', 'sightseeing', 'start', 'end'],
-              }
-            }
-          ]
-        }
-      ]
-    }),
-    defineField({
-      name: 'sightseeingHighlights',
-      title: 'Sightseeing Highlights',
-      type: 'array',
-      of: [
-        {
-          type: 'object',
-          fields: [
-            {
-              name: 'title',
-              title: 'Title',
-              type: 'string',
-              validation: (Rule) => Rule.required(),
-            },
-            {
-              name: 'description',
-              title: 'Description',
-              type: 'text',
-              validation: (Rule) => Rule.required(),
-            },
-          ],
-        },
-      ],
-    }),
-    defineField({
-      name: 'travelHighlights',
-      title: 'Travel Highlights',
-      type: 'array',
-      of: [
-        {
-          type: 'object',
-          fields: [
-            {
-              name: 'title',
-              title: 'Title',
-              type: 'string',
-              validation: (Rule) => Rule.required(),
-            },
-            {
-              name: 'description',
-              title: 'Description',
-              type: 'text',
-              validation: (Rule) => Rule.required(),
-            },
-            {
-              name: 'icon',
-              title: 'Icon',
-              type: 'string',
-              validation: (Rule) => Rule.required(),
-            },
-          ],
-        },
-      ],
-    }),
-    defineField({
-      name: 'faqs',
-      title: 'FAQs',
-      type: 'array',
-      of: [
-        {
-          type: 'object',
-          fields: [
-            {
-              name: 'question',
-              title: 'Question',
-              type: 'string',
-              validation: (Rule) => Rule.required(),
-            },
-            {
-              name: 'answer',
-              title: 'Answer',
-              type: 'text',
-              validation: (Rule) => Rule.required(),
-            },
-          ],
-        },
-      ],
-    }),
-    defineField({
-      name: 'travelStyle',
-      title: 'Travel Style',
-      type: 'object',
-      fields: [
-        {
-          name: 'name',
-          title: 'Style Name',
-          type: 'string',
-          options: {
-            list: ['Country Explorer', 'Regional Explorer', 'Discovery', 'Family Experience'],
-          },
-        },
-        {
-          name: 'description',
-          title: 'Style Description',
-          type: 'text',
-        },
-        {
-          name: 'features',
-          title: 'Style Features',
-          type: 'array',
-          of: [{type: 'string'}],
-        },
-      ],
-    }),
-    defineField({
-      name: 'departureDates',
-      title: 'Departure Dates',
-      type: 'array',
-      of: [
-        {
-          type: 'object',
-          fields: [
-            {
-              name: 'date',
-              title: 'Date',
-              type: 'date',
-            },
-            {
-              name: 'price',
-              title: 'Price',
-              type: 'number',
-            },
-            {
-              name: 'availability',
-              title: 'Availability',
-              type: 'string',
-              options: {
-                list: ['Available', 'Almost Full', 'Guaranteed', 'Sold Out'],
-              },
-            },
-          ],
-        },
-      ],
-    }),
+    // Additional Information
     defineField({
       name: 'included',
       title: 'What\'s Included',
@@ -436,6 +481,83 @@ export default defineType({
       title: 'Not Included',
       type: 'array',
       of: [{type: 'string'}],
+    }),
+    defineField({
+      name: 'sightseeingHighlights',
+      title: 'Sightseeing Highlights',
+      type: 'array',
+      group: 'details',
+      of: [
+        {
+          type: 'object',
+          fields: [
+            {
+              name: 'title',
+              title: 'Title',
+              type: 'string',
+              validation: (Rule) => Rule.required(),
+            },
+            {
+              name: 'description',
+              title: 'Description',
+              type: 'text',
+              validation: (Rule) => Rule.required(),
+            }
+          ]
+        }
+      ]
+    }),
+    defineField({
+      name: 'travelHighlights',
+      title: 'Travel Highlights',
+      type: 'array',
+      group: 'details',
+      of: [
+        {
+          type: 'object',
+          fields: [
+            {
+              name: 'title',
+              title: 'Title',
+              type: 'string',
+              validation: (Rule) => Rule.required(),
+            },
+            {
+              name: 'description',
+              title: 'Description',
+              type: 'text',
+              validation: (Rule) => Rule.required(),
+            },
+            {
+              name: 'icon',
+              title: 'Icon (emoji)',
+              type: 'string',
+            },
+            {
+              name: 'image',
+              title: 'Image',
+              type: 'image',
+              options: {
+                hotspot: true,
+              },
+              fields: [
+                {
+                  name: 'alt',
+                  type: 'string',
+                  title: 'Alternative Text',
+                }
+              ]
+            },
+            {
+              name: 'locations',
+              title: 'Locations',
+              type: 'array',
+              of: [{type: 'string'}],
+              validation: (Rule) => Rule.required(),
+            },
+          ]
+        }
+      ]
     }),
     defineField({
       name: 'travelRequirements',
@@ -485,12 +607,12 @@ export default defineType({
             },
             {
               name: 'date',
-              title: 'Date',
+              title: 'Review Date',
               type: 'date',
             },
             {
               name: 'review',
-              title: 'Review',
+              title: 'Review Text',
               type: 'text',
             },
             {
@@ -498,47 +620,31 @@ export default defineType({
               title: 'Travel Date',
               type: 'date',
             },
-          ],
-        },
-      ],
-    }),
-    defineField({
-      name: 'priceIncludes',
-      title: 'Price Includes',
-      type: 'array',
-      of: [{type: 'string'}],
-    }),
-    defineField({
-      name: 'travelProtection',
-      title: 'Travel Protection',
-      type: 'object',
-      fields: [
-        {
-          name: 'plans',
-          title: 'Protection Plans',
-          type: 'array',
-          of: [
             {
-              type: 'object',
-              fields: [
-                {
-                  name: 'name',
-                  title: 'Plan Name',
-                  type: 'string',
-                },
-                {
-                  name: 'price',
-                  title: 'Price',
-                  type: 'number',
-                },
-                {
-                  name: 'coverage',
-                  title: 'Coverage Details',
-                  type: 'array',
-                  of: [{type: 'string'}],
-                },
-              ],
+              name: 'location',
+              title: 'Reviewer Location',
+              type: 'string',
             },
+            {
+              name: 'images',
+              title: 'Review Images',
+              type: 'array',
+              of: [
+                {
+                  type: 'image',
+                  options: {
+                    hotspot: true,
+                  },
+                  fields: [
+                    {
+                      name: 'caption',
+                      type: 'string',
+                      title: 'Caption',
+                    }
+                  ]
+                }
+              ]
+            }
           ],
         },
       ],

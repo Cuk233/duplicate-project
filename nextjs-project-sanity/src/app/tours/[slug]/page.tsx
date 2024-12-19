@@ -31,8 +31,15 @@ const TOUR_QUERY = `*[_type == "tour" && slug.current == $slug][0]{
     score,
     reviewCount
   },
-  tripStyle,
-  mainImage,
+  tripStyle {
+    name,
+    description,
+    features
+  },
+  mainImage {
+    asset->,
+    alt
+  },
   duration,
   startEndCities {
     startCity,
@@ -45,19 +52,31 @@ const TOUR_QUERY = `*[_type == "tour" && slug.current == $slug][0]{
     title,
     description,
     locations,
+    thumbnailImage {
+      asset->,
+      alt
+    },
+    expandedImage {
+      asset->,
+      alt
+    },
     meals {
       breakfast,
       lunch,
       dinner
     },
+    tags,
+    specialFeature,
     activities[] {
       type,
-      description
+      description,
+      duration
     },
     optionalExperiences[] {
       title,
       description,
-      price
+      price,
+      duration
     }
   },
   mapPoints[] {
@@ -70,7 +89,11 @@ const TOUR_QUERY = `*[_type == "tour" && slug.current == $slug][0]{
   },
   sightseeingHighlights[] {
     title,
-    description
+    description,
+    image {
+      asset->,
+      alt
+    }
   },
   travelHighlights[] {
     title,
@@ -112,7 +135,14 @@ export default async function TourPage({ params }: TourPageProps) {
     );
   }
 
-  const imageUrl = tour.mainImage ? urlForImage(tour.mainImage)?.url() : null;
+  const imageUrl = tour.mainImage ? urlForImage(tour.mainImage) : null;
+
+  // Extract tripStyle data
+  const tripStyle = tour.tripStyle ? {
+    name: tour.tripStyle.name || '',
+    description: tour.tripStyle.description || '',
+    features: tour.tripStyle.features || []
+  } : null;
 
   return (
     <div className="min-h-screen">
@@ -191,7 +221,7 @@ export default async function TourPage({ params }: TourPageProps) {
                     </svg>
                     Trip Style
                   </h3>
-                  <p className="text-gray-600">{tour.tripStyle}</p>
+                  <p className="text-gray-600">{tripStyle?.name || 'Standard Tour'}</p>
                 </div>
               </div>
 
@@ -204,6 +234,16 @@ export default async function TourPage({ params }: TourPageProps) {
                       {tour.price.currency} {tour.price.amount.toLocaleString()}
                     </p>
                     <p className="text-sm text-gray-600">{tour.price.priceType}</p>
+                    {tour.rating && (
+                      <div className="flex items-center gap-2 mt-2">
+                        <div className="flex text-yellow-400">
+                          {[...Array(5)].map((_, i) => (
+                            <span key={i} className={i < Math.floor(tour.rating.score) ? 'text-yellow-400' : 'text-gray-300'}>★</span>
+                          ))}
+                        </div>
+                        <span className="text-sm text-gray-600">{tour.rating.score.toFixed(1)}/5 ({tour.rating.reviewCount} reviews)</span>
+                      </div>
+                    )}
                   </div>
                   <button className="bg-red-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors">
                     Book Now
@@ -229,14 +269,11 @@ export default async function TourPage({ params }: TourPageProps) {
           {/* Left Column - Main Content */}
           <div className="lg:col-span-2 space-y-8">
             {/* Travel Style */}
-            <TravelStyle travelStyle={tour.travelStyle} />
+            {tripStyle && <TravelStyle travelStyle={tripStyle} />}
 
             {/* Map & Itinerary */}
             <section id="itinerary" className="bg-white rounded-lg p-6 shadow-sm">
-              <h2 className="text-2xl font-bold mb-6">Trip Map & Itinerary</h2>
-              <div className="bg-gray-100 rounded-lg p-4 h-[400px] flex items-center justify-center mb-8">
-                <p className="text-gray-500">Map of {tour.startEndCities.startCity} to {tour.startEndCities.endCity}</p>
-              </div>
+              <h2 className="text-2xl font-bold mb-6">Day by day itinerary</h2>
               <DayByDayItinerary itinerary={tour.itinerary} />
             </section>
 
@@ -269,29 +306,89 @@ export default async function TourPage({ params }: TourPageProps) {
                 departureDates={tour.departureDates} 
                 currency={tour.price.currency} 
               />
+            </div>
+          </div>
+        </div>
+      </div>
 
-              {/* Quick Links */}
-              <div className="bg-white rounded-lg p-6 shadow-sm mt-8">
-                <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
-                <nav className="space-y-2">
-                  <a href="#itinerary" className="block text-red-600 hover:text-red-700">View Itinerary</a>
-                  <a href="#included" className="block text-red-600 hover:text-red-700">What's Included</a>
-                  <a href="#highlights" className="block text-red-600 hover:text-red-700">Trip Highlights</a>
-                  <a href="#faq" className="block text-red-600 hover:text-red-700">FAQs</a>
-                </nav>
+      {/* Travel Matter Section */}
+      <div className="bg-emerald-900 text-white py-16">
+        <div className="container mx-auto px-4">
+          <h2 className="text-center text-3xl font-bold mb-12">WE MAKE TRAVEL MATTER®</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="text-center">
+              <div className="mb-4">
+                <Image
+                  src="/images/sustainable-travel.jpg"
+                  alt="Sustainable Travel"
+                  width={300}
+                  height={200}
+                  className="rounded-lg mx-auto"
+                />
               </div>
+              <h3 className="font-semibold mb-2">Sustainable Travel</h3>
+              <p className="text-sm">Supporting initiatives that protect our planet and communities.</p>
+            </div>
+            <div className="text-center">
+              <div className="mb-4">
+                <Image
+                  src="/images/local-experiences.jpg"
+                  alt="Local Experiences"
+                  width={300}
+                  height={200}
+                  className="rounded-lg mx-auto"
+                />
+              </div>
+              <h3 className="font-semibold mb-2">Local Experiences</h3>
+              <p className="text-sm">Connecting you with local communities and cultures.</p>
+            </div>
+            <div className="text-center">
+              <div className="mb-4">
+                <Image
+                  src="/images/responsible-tourism.jpg"
+                  alt="Responsible Tourism"
+                  width={300}
+                  height={200}
+                  className="rounded-lg mx-auto"
+                />
+              </div>
+              <h3 className="font-semibold mb-2">Responsible Tourism</h3>
+              <p className="text-sm">Preserving the places we visit for future generations.</p>
+            </div>
+          </div>
+        </div>
+      </div>
 
-              {/* Need Help */}
-              <div className="bg-white rounded-lg p-6 shadow-sm mt-8">
-                <h3 className="text-lg font-semibold mb-4">Need Help?</h3>
-                <p className="text-gray-600 mb-4">
-                  Our travel experts are here to assist you with planning your trip.
-                </p>
-                <button className="w-full bg-gray-100 text-gray-800 px-4 py-2 rounded hover:bg-gray-200 transition-colors">
-                  Contact Us
+      {/* Reviews Section */}
+      <div className="bg-gray-50 py-16">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-center text-3xl font-bold mb-12">Guest Reviews</h2>
+            {tour.rating ? (
+              <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <div className="flex text-yellow-400 mb-2">
+                      {[...Array(5)].map((_, i) => (
+                        <span key={i} className={i < Math.floor(tour.rating.score) ? 'text-yellow-400' : 'text-gray-300'}>★</span>
+                      ))}
+                    </div>
+                    <h3 className="font-semibold">{tour.rating.score.toFixed(1)} / 5</h3>
+                    <p className="text-sm text-gray-600">Based on {tour.rating.reviewCount} reviews</p>
+                  </div>
+                  <button className="bg-red-600 text-white py-2 px-6 rounded-lg hover:bg-red-700 transition duration-200">
+                    Write a Review
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="bg-white rounded-lg shadow-lg p-6 mb-8 text-center">
+                <p className="text-gray-600">No reviews yet</p>
+                <button className="mt-4 bg-red-600 text-white py-2 px-6 rounded-lg hover:bg-red-700 transition duration-200">
+                  Be the First to Review
                 </button>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>
