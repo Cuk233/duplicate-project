@@ -5,6 +5,8 @@ import React, { useState } from 'react';
 interface FAQItem {
   question: string;
   answer: string;
+  category: string;
+  order: number;
 }
 
 interface FAQProps {
@@ -13,9 +15,18 @@ interface FAQProps {
 
 export default function FAQ({ questions = [] }: FAQProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const [expandAll, setExpandAll] = useState(false);
 
   const toggleQuestion = (index: number) => {
+    if (expandAll) {
+      setExpandAll(false);
+    }
     setOpenIndex(openIndex === index ? null : index);
+  };
+
+  const handleExpandAll = () => {
+    setExpandAll(!expandAll);
+    setOpenIndex(null);
   };
 
   if (!questions || questions.length === 0) {
@@ -26,32 +37,86 @@ export default function FAQ({ questions = [] }: FAQProps) {
     );
   }
 
+  // Sort questions by category and order
+  const sortedQuestions = [...questions].sort((a, b) => {
+    if (a.category !== b.category) {
+      return a.category.localeCompare(b.category);
+    }
+    return (a.order || 0) - (b.order || 0);
+  });
+
+  // Group questions by category
+  const groupedQuestions = sortedQuestions.reduce((acc, question) => {
+    const category = question.category;
+    if (!acc[category]) {
+      acc[category] = [];
+    }
+    acc[category].push(question);
+    return acc;
+  }, {} as Record<string, FAQItem[]>);
+
+  const getCategoryTitle = (category: string) => {
+    switch (category) {
+      case 'departure':
+        return 'Departure Information';
+      case 'booking':
+        return 'Booking & Flights';
+      case 'pricing':
+        return 'Pricing & Payments';
+      case 'experiences':
+        return 'Experiences';
+      case 'solo':
+        return 'Solo Travelers';
+      case 'additional':
+        return 'Additional Information';
+      default:
+        return category;
+    }
+  };
+
   return (
-    <div className="faq-accordion">
-      {questions.map((item, index) => (
-        <div 
-          key={index} 
-          className={`faq-item ${openIndex === index ? 'active' : ''}`}
+    <div>
+      <div className="flex justify-end mb-6">
+        <button
+          onClick={handleExpandAll}
+          className="text-red-600 hover:text-red-700 text-sm font-medium"
         >
-          <button
-            className="faq-question"
-            onClick={() => toggleQuestion(index)}
-            aria-expanded={openIndex === index}
-          >
-            <span>{item.question}</span>
-            <span className="icon">
-              {openIndex === index ? '−' : '+'}
-            </span>
-          </button>
-          <div 
-            className={`faq-answer ${openIndex === index ? 'open' : ''}`}
-          >
-            <div className="faq-answer-content">
-              {item.answer}
+          {expandAll ? 'Collapse All' : 'Expand All'}
+        </button>
+      </div>
+
+      <div className="space-y-8">
+        {Object.entries(groupedQuestions).map(([category, categoryQuestions]) => (
+          <div key={category} className="space-y-4">
+            <div className="faq-accordion">
+              {categoryQuestions.map((item, index) => (
+                <div 
+                  key={index} 
+                  className={`faq-item ${openIndex === index || expandAll ? 'active' : ''}`}
+                >
+                  <button
+                    className="faq-question"
+                    onClick={() => toggleQuestion(index)}
+                    aria-expanded={openIndex === index || expandAll}
+                  >
+                    <span>{item.question}</span>
+                    <span className="icon">
+                      {openIndex === index || expandAll ? '−' : '+'}
+                    </span>
+                  </button>
+                  <div 
+                    className={`faq-answer ${openIndex === index || expandAll ? 'open' : ''}`}
+                  >
+                    <div className="faq-answer-content">
+                      {item.answer}
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
 
       <style jsx>{`
         .faq-accordion {

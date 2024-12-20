@@ -10,6 +10,7 @@ import FAQ from "@/components/tours/FAQ";
 import TravelStyle from "@/components/tours/TravelStyle";
 import DepartureDates from "@/components/tours/DepartureDates";
 import IncludedItems from "@/components/tours/IncludedItems";
+import AboutThisTrip from "@/components/tours/AboutThisTrip";
 
 interface TourPageProps {
   params: {
@@ -60,6 +61,18 @@ const TOUR_QUERY = `*[_type == "tour" && slug.current == $slug][0]{
       asset->,
       alt
     },
+    arrivalTransfer {
+      time,
+      location
+    },
+    welcome {
+      time,
+      description
+    },
+    accommodation {
+      name,
+      location
+    },
     meals {
       breakfast,
       lunch,
@@ -70,13 +83,21 @@ const TOUR_QUERY = `*[_type == "tour" && slug.current == $slug][0]{
     activities[] {
       type,
       description,
-      duration
+      isIncluded,
+      image {
+        asset->,
+        alt
+      }
     },
     optionalExperiences[] {
       title,
       description,
+      type,
       price,
-      duration
+      image {
+        asset->,
+        alt
+      }
     }
   },
   mapPoints[] {
@@ -90,10 +111,7 @@ const TOUR_QUERY = `*[_type == "tour" && slug.current == $slug][0]{
   sightseeingHighlights[] {
     title,
     description,
-    image {
-      asset->,
-      alt
-    }
+    locations
   },
   travelHighlights[] {
     title,
@@ -269,7 +287,9 @@ export default async function TourPage({ params }: TourPageProps) {
           {/* Left Column - Main Content */}
           <div className="lg:col-span-2 space-y-8">
             {/* Travel Style */}
-            {tripStyle && <TravelStyle travelStyle={tripStyle} />}
+            {/* {tripStyle && <TravelStyle travelStyle={tripStyle} />} */}
+
+            
 
             {/* Map & Itinerary */}
             <section id="itinerary" className="bg-white rounded-lg p-6 shadow-sm">
@@ -279,19 +299,13 @@ export default async function TourPage({ params }: TourPageProps) {
 
             {/* What's Included */}
             <IncludedItems included={tour.included} notIncluded={tour.notIncluded} />
-
-            {/* Sightseeing Highlights */}
+            {/* About This Trip */}
             <section className="bg-white rounded-lg p-6 shadow-sm">
-              <h2 className="text-2xl font-bold mb-6">Sightseeing Highlights</h2>
-              <SightseeingHighlights highlights={tour.sightseeingHighlights} />
+              <AboutThisTrip 
+                sightseeingHighlights={tour.sightseeingHighlights}
+                travelHighlights={tour.travelHighlights}
+              />
             </section>
-
-            {/* Travel Highlights */}
-            <section className="bg-white rounded-lg p-6 shadow-sm">
-              <h2 className="text-2xl font-bold mb-6">Travel Highlights</h2>
-              <TravelHighlights highlights={tour.travelHighlights} />
-            </section>
-
             {/* FAQs */}
             <section className="bg-white rounded-lg p-6 shadow-sm">
               <h2 className="text-2xl font-bold mb-6">Frequently Asked Questions</h2>
@@ -300,7 +314,7 @@ export default async function TourPage({ params }: TourPageProps) {
           </div>
 
           {/* Right Column - Sidebar */}
-          <div className="space-y-8">
+          <div className="space-y-2">
             <div className="sticky top-8">
               <DepartureDates 
                 departureDates={tour.departureDates} 

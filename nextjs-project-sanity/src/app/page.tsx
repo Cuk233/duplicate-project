@@ -28,7 +28,7 @@ export default async function HomePage() {
       <h1 className="text-4xl font-bold mb-8">Available Tours</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {tours.map((tour) => {
-          const imageUrl = tour.mainImage ? urlForImage(tour.mainImage) : null;
+          const imageUrl = urlForImage(tour.mainImage);
           
           return (
             <Link 

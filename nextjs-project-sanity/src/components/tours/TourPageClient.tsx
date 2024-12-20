@@ -3,8 +3,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import DayByDayItinerary from './DayByDayItinerary';
-import SightseeingHighlights from './SightseeingHighlights';
-import TravelHighlights from './TravelHighlights';
+import AboutThisTrip from './SightseeingHighlights';
 import FAQ from './FAQ';
 import { type SanityDocument } from "next-sanity";
 
@@ -146,16 +145,18 @@ export default function TourPageClient({ tour, imageUrl }: TourPageClientProps) 
                   <DayByDayItinerary itinerary={tour.itinerary} />
                 </section>
 
-                {/* Sightseeing Highlights */}
+                {/* About this Trip */}
                 <section className="mb-12">
-                  <h2 className="text-2xl font-bold mb-6">Sightseeing Highlights</h2>
-                  <SightseeingHighlights highlights={tour.sightseeingHighlights} />
+                  <AboutThisTrip 
+                    sightseeingHighlights={tour.sightseeingHighlights}
+                    travelHighlights={tour.travelHighlights}
+                  />
                 </section>
 
-                {/* Travel Highlights */}
+                {/* FAQs */}
                 <section className="mb-12">
-                  <h2 className="text-2xl font-bold mb-6">Travel Highlights</h2>
-                  <TravelHighlights highlights={tour.travelHighlights} />
+                  <h2 className="text-2xl font-bold mb-6">Frequently Asked Questions</h2>
+                  <FAQ questions={tour.faqs} />
                 </section>
 
                 {/* Trip Details */}
@@ -197,12 +198,6 @@ export default function TourPageClient({ tour, imageUrl }: TourPageClientProps) 
                       </ul>
                     </div>
                   </div>
-                </section>
-
-                {/* FAQs */}
-                <section className="mb-12">
-                  <h2 className="text-2xl font-bold mb-6">Frequently Asked Questions</h2>
-                  <FAQ questions={tour.faqs} />
                 </section>
               </>
             )}

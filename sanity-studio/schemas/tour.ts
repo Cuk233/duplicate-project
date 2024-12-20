@@ -289,100 +289,136 @@ export default defineType({
         {
           type: 'object',
           fields: [
-            {
+            defineField({
               name: 'day',
               title: 'Day',
               type: 'number',
               validation: (Rule) => Rule.required().min(1),
-            },
-            {
+            }),
+            defineField({
               name: 'title',
               title: 'Title',
               type: 'string',
               validation: (Rule) => Rule.required(),
-            },
-            {
+            }),
+            defineField({
               name: 'description',
               title: 'Description',
               type: 'text',
-              validation: (Rule) => Rule.required(),
-            },
-            {
-              name: 'thumbnailImage',
-              title: 'Thumbnail Image',
-              type: 'image',
-              description: 'This image will be shown in the collapsed view (192x128px recommended)',
-              options: {
-                hotspot: true,
-              },
-              fields: [
-                {
-                  name: 'alt',
-                  type: 'string',
-                  title: 'Alternative Text',
-                  description: 'Important for SEO and accessibility',
-                }
-              ],
-              validation: (Rule) => Rule.required(),
-            },
-            {
-              name: 'expandedImage',
-              title: 'Expanded View Image',
-              type: 'image',
-              description: 'This larger image will be shown when the day is expanded',
-              options: {
-                hotspot: true,
-              },
-              fields: [
-                {
-                  name: 'alt',
-                  type: 'string',
-                  title: 'Alternative Text',
-                  description: 'Important for SEO and accessibility',
-                }
-              ]
-            },
-            {
+            }),
+            defineField({
               name: 'locations',
               title: 'Locations',
               type: 'array',
               of: [{type: 'string'}],
-              validation: (Rule) => Rule.required(),
-            },
-            {
-              name: 'tags',
-              title: 'Tags',
-              type: 'array',
-              description: 'Add tags like "Arrival Transfer", "Welcome", etc.',
-              of: [{type: 'string'}],
+            }),
+            defineField({
+              name: 'thumbnailImage',
+              title: 'Thumbnail Image',
+              type: 'image',
               options: {
-                layout: 'tags'
-              }
-            },
-            {
-              name: 'specialFeature',
-              title: 'Special Feature',
-              type: 'string',
-              description: 'Special feature badge like "Trafalgar Difference"',
+                hotspot: true,
+              },
+              fields: [
+                {
+                  name: 'alt',
+                  type: 'string',
+                  title: 'Alternative Text',
+                }
+              ]
+            }),
+            defineField({
+              name: 'expandedImage',
+              title: 'Expanded Image',
+              type: 'image',
               options: {
-                list: [
-                  {title: 'Trafalgar Difference', value: 'Trafalgar Difference'},
-                  {title: 'Be My Guest', value: 'Be My Guest'},
-                  {title: 'Cultural Insight', value: 'Cultural Insight'},
-                ]
-              }
-            },
-            {
+                hotspot: true,
+              },
+              fields: [
+                {
+                  name: 'alt',
+                  type: 'string',
+                  title: 'Alternative Text',
+                }
+              ]
+            }),
+            defineField({
+              name: 'arrivalTransfer',
+              title: 'Arrival Transfer',
+              type: 'object',
+              fields: [
+                {
+                  name: 'time',
+                  title: 'Time',
+                  type: 'string',
+                },
+                {
+                  name: 'location',
+                  title: 'Location',
+                  type: 'string',
+                }
+              ]
+            }),
+            defineField({
+              name: 'welcome',
+              title: 'Welcome',
+              type: 'object',
+              fields: [
+                {
+                  name: 'time',
+                  title: 'Time',
+                  type: 'string',
+                },
+                {
+                  name: 'description',
+                  title: 'Description',
+                  type: 'string',
+                }
+              ]
+            }),
+            defineField({
+              name: 'accommodation',
+              title: 'Accommodation',
+              type: 'object',
+              fields: [
+                {
+                  name: 'name',
+                  title: 'Name',
+                  type: 'string',
+                },
+                {
+                  name: 'location',
+                  title: 'Location',
+                  type: 'string',
+                }
+              ]
+            }),
+            defineField({
               name: 'meals',
               title: 'Meals',
               type: 'object',
               fields: [
-                {name: 'breakfast', title: 'Breakfast', type: 'boolean'},
-                {name: 'lunch', title: 'Lunch', type: 'boolean'},
-                {name: 'dinner', title: 'Dinner', type: 'boolean'},
+                {
+                  name: 'breakfast',
+                  title: 'Breakfast',
+                  type: 'boolean',
+                  initialValue: false,
+                },
+                {
+                  name: 'lunch',
+                  title: 'Lunch',
+                  type: 'boolean',
+                  initialValue: false,
+                },
+                {
+                  name: 'dinner',
+                  title: 'Dinner',
+                  type: 'boolean',
+                  initialValue: false,
+                }
               ]
-            },
-            {
+            }),
+            defineField({
               name: 'activities',
               title: 'Activities',
               type: 'array',
@@ -395,24 +431,46 @@ export default defineType({
                       title: 'Type',
                       type: 'string',
                       options: {
-                        list: ['Sightseeing', 'Dining', 'Cultural', 'Leisure', 'Transfer'],
-                      }
+                        list: [
+                          { title: 'Sightseeing', value: 'Sightseeing' },
+                          { title: 'Dining', value: 'Dining' },
+                          { title: 'Cultural', value: 'Cultural' },
+                          { title: 'Leisure', value: 'Leisure' }
+                        ]
+                      },
+                      validation: (Rule) => Rule.required()
                     },
                     {
                       name: 'description',
                       title: 'Description',
-                      type: 'string',
+                      type: 'text'
                     },
                     {
-                      name: 'duration',
-                      title: 'Duration (hours)',
-                      type: 'number',
+                      name: 'isIncluded',
+                      title: 'Is Included',
+                      type: 'boolean',
+                      initialValue: true
+                    },
+                    {
+                      name: 'image',
+                      title: 'Activity Image',
+                      type: 'image',
+                      options: {
+                        hotspot: true,
+                      },
+                      fields: [
+                        {
+                          name: 'alt',
+                          type: 'string',
+                          title: 'Alternative Text',
+                        }
+                      ]
                     }
                   ]
                 }
               ]
-            },
-            {
+            }),
+            defineField({
               name: 'optionalExperiences',
               title: 'Optional Experiences',
               type: 'array',
@@ -424,30 +482,64 @@ export default defineType({
                       name: 'title',
                       title: 'Title',
                       type: 'string',
+                      validation: (Rule) => Rule.required()
                     },
                     {
                       name: 'description',
                       title: 'Description',
-                      type: 'text',
+                      type: 'text'
+                    },
+                    {
+                      name: 'type',
+                      title: 'Experience Type',
+                      type: 'string',
+                      options: {
+                        list: [
+                          { title: 'Optional Experience', value: 'Optional Experience' },
+                          { title: 'Iconic Experience', value: 'Iconic Experience' },
+                          { title: 'Cultural Experience', value: 'Cultural Experience' },
+                          { title: 'Adventure Experience', value: 'Adventure Experience' }
+                        ]
+                      }
                     },
                     {
                       name: 'price',
                       title: 'Price',
-                      type: 'number',
+                      type: 'number'
                     },
                     {
-                      name: 'duration',
-                      title: 'Duration (hours)',
-                      type: 'number',
+                      name: 'image',
+                      title: 'Experience Image',
+                      type: 'image',
+                      options: {
+                        hotspot: true,
+                      },
+                      fields: [
+                        {
+                          name: 'alt',
+                          type: 'string',
+                          title: 'Alternative Text',
+                        }
+                      ]
                     }
                   ]
                 }
               ]
-            }
-          ],
-        },
-      ],
-      validation: (Rule) => Rule.required(),
+            }),
+            defineField({
+              name: 'tags',
+              title: 'Tags',
+              type: 'array',
+              of: [{type: 'string'}],
+            }),
+            defineField({
+              name: 'specialFeature',
+              title: 'Special Feature',
+              type: 'string',
+            })
+          ]
+        }
+      ]
     }),
     // Additional Information
     defineField({
@@ -502,6 +594,13 @@ export default defineType({
               title: 'Description',
               type: 'text',
               validation: (Rule) => Rule.required(),
+            },
+            {
+              name: 'locations',
+              title: 'Locations',
+              type: 'array',
+              of: [{type: 'string'}],
+              validation: (Rule) => Rule.required(),
             }
           ]
         }
@@ -530,31 +629,18 @@ export default defineType({
             },
             {
               name: 'icon',
-              title: 'Icon (emoji)',
+              title: 'Icon',
               type: 'string',
-            },
-            {
-              name: 'image',
-              title: 'Image',
-              type: 'image',
               options: {
-                hotspot: true,
-              },
-              fields: [
-                {
-                  name: 'alt',
-                  type: 'string',
-                  title: 'Alternative Text',
-                }
-              ]
-            },
-            {
-              name: 'locations',
-              title: 'Locations',
-              type: 'array',
-              of: [{type: 'string'}],
-              validation: (Rule) => Rule.required(),
-            },
+                list: [
+                  { title: 'Expert Guide', value: 'guide' },
+                  { title: 'Accommodation', value: 'hotel' },
+                  { title: 'Transportation', value: 'transport' },
+                  { title: 'Meals', value: 'meals' },
+                  { title: 'Experiences', value: 'experiences' }
+                ]
+              }
+            }
           ]
         }
       ]
@@ -648,6 +734,53 @@ export default defineType({
           ],
         },
       ],
+    }),
+    defineField({
+      name: 'faqs',
+      title: 'Frequently Asked Questions',
+      type: 'array',
+      group: 'details',
+      of: [
+        {
+          type: 'object',
+          fields: [
+            {
+              name: 'question',
+              title: 'Question',
+              type: 'string',
+              validation: (Rule) => Rule.required(),
+            },
+            {
+              name: 'answer',
+              title: 'Answer',
+              type: 'text',
+              validation: (Rule) => Rule.required(),
+            },
+            {
+              name: 'category',
+              title: 'Category',
+              type: 'string',
+              options: {
+                list: [
+                  { title: 'Departure Information', value: 'departure' },
+                  { title: 'Booking & Flights', value: 'booking' },
+                  { title: 'Pricing & Payments', value: 'pricing' },
+                  { title: 'Experiences', value: 'experiences' },
+                  { title: 'Solo Travelers', value: 'solo' },
+                  { title: 'Additional Information', value: 'additional' }
+                ]
+              },
+              validation: (Rule) => Rule.required(),
+            },
+            {
+              name: 'order',
+              title: 'Display Order',
+              type: 'number',
+              initialValue: 0,
+            }
+          ]
+        }
+      ]
     }),
   ],
 }) 
