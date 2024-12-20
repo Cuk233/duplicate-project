@@ -1,4 +1,5 @@
 import { type SanityDocument } from "next-sanity";
+import { Metadata, ResolvingMetadata } from "next";
 import Image from "next/image";
 import { client } from "@/sanity/client";
 import { urlForImage } from "@/lib/sanity.image";
@@ -12,10 +13,23 @@ import DepartureDates from "@/components/tours/DepartureDates";
 import IncludedItems from "@/components/tours/IncludedItems";
 import AboutThisTrip from "@/components/tours/AboutThisTrip";
 
-interface TourPageProps {
-  params: {
-    slug: string;
-  };
+type Props = {
+  params: { slug: string };
+  searchParams?: Record<string, string | string[] | undefined>;
+}
+
+export async function generateMetadata(
+  { params }: Props
+): Promise<Metadata> {
+  const tour = await client.fetch<SanityDocument>(
+    `*[_type == "tour" && slug.current == $slug][0]{ title, summary }`,
+    { slug: params.slug }
+  );
+
+  return {
+    title: tour?.title || 'Tour Details',
+    description: tour?.summary || 'View tour details and itinerary',
+  }
 }
 
 const TOUR_QUERY = `*[_type == "tour" && slug.current == $slug][0]{
@@ -134,10 +148,8 @@ export async function generateStaticParams() {
   }));
 }
 
-export default async function TourPage({ params }: TourPageProps) {
-  // Wait for params to be resolved
-  const resolvedParams = await Promise.resolve(params);
-  const { slug } = resolvedParams;
+export default async function TourPage({ params }: Props) {
+  const { slug } = params;
   
   const tour = await client.fetch<SanityDocument>(TOUR_QUERY, { slug });
 
@@ -155,7 +167,6 @@ export default async function TourPage({ params }: TourPageProps) {
 
   const imageUrl = tour.mainImage ? urlForImage(tour.mainImage) : null;
 
-  // Extract tripStyle data
   const tripStyle = tour.tripStyle ? {
     name: tour.tripStyle.name || '',
     description: tour.tripStyle.description || '',
