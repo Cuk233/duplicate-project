@@ -2,26 +2,49 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { type SanityDocument } from "next-sanity";
 import { urlForImage } from "@/lib/sanity.image";
+import type { SanityImageSource } from "@sanity/image-url/lib/types/types";
+
+// Sanity image types
+interface SanityReference {
+  _ref: string;
+  _type: "reference";
+}
+
+interface SanityImageAsset {
+  _ref: string;
+  _type: "sanity.imageAsset";
+  url?: string;
+}
+
+interface CustomImage {
+  _type?: "image";
+  asset: SanityReference | SanityImageAsset;
+  alt?: string;
+}
+
+interface Activity {
+  type: string;
+  description: string;
+  isIncluded: boolean;
+  image?: CustomImage;
+}
+
+interface OptionalExperience {
+  title: string;
+  description: string;
+  type: string;
+  price: number;
+  image?: CustomImage;
+}
 
 interface ItineraryDay {
   day: number;
   title: string;
   description: string;
   locations: string[];
-  thumbnailImage?: {
-    asset: {
-      _ref: string;
-    };
-    alt?: string;
-  };
-  expandedImage?: {
-    asset: {
-      _ref: string;
-    };
-    alt?: string;
-  };
+  thumbnailImage?: CustomImage;
+  expandedImage?: CustomImage;
   arrivalTransfer?: {
     time: string;
     location: string;
@@ -39,29 +62,8 @@ interface ItineraryDay {
     lunch: boolean;
     dinner: boolean;
   };
-  activities?: {
-    type: string;
-    description: string;
-    isIncluded: boolean;
-    image?: {
-      asset: {
-        _ref: string;
-      };
-      alt?: string;
-    };
-  }[];
-  optionalExperiences?: {
-    title: string;
-    description: string;
-    type: string;
-    price: number;
-    image?: {
-      asset: {
-        _ref: string;
-      };
-      alt?: string;
-    };
-  }[];
+  activities: Activity[];
+  optionalExperiences?: OptionalExperience[];
   tags?: string[];
   specialFeature?: string;
 }
@@ -75,7 +77,6 @@ export default function DayByDayItinerary({ itinerary }: DayByDayItineraryProps)
   const [imageLoadError, setImageLoadError] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
-    // Log the entire itinerary data when component mounts
     console.log('Full itinerary data:', itinerary);
   }, [itinerary]);
 
@@ -84,12 +85,10 @@ export default function DayByDayItinerary({ itinerary }: DayByDayItineraryProps)
     setExpandedDay(isCurrentlyExpanded ? null : dayNumber);
 
     if (!isCurrentlyExpanded) {
-      // Get the element to scroll to
       const element = document.getElementById(`day-${dayNumber}`);
       if (element) {
-        // Add a small delay to ensure the content is expanded before scrolling
         setTimeout(() => {
-          const yOffset = -100; // Offset from the top of the viewport (adjust as needed)
+          const yOffset = -100;
           const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
           window.scrollTo({ top: y, behavior: 'smooth' });
         }, 100);
@@ -99,22 +98,37 @@ export default function DayByDayItinerary({ itinerary }: DayByDayItineraryProps)
 
   if (!itinerary || itinerary.length === 0) return null;
 
-  const getImageUrl = (image: any) => {
-    // Log the raw image data
-    console.log('Raw image data:', image);
-
-    if (!image?.asset?._ref && !image?.asset?.url) {
-      console.log('No asset reference or URL found');
+  const getImageUrl = (image: CustomImage | undefined): string | null => {
+    console.log('Input image data:', image);
+    
+    if (!image?.asset) {
+      console.log('No asset found');
       return null;
     }
 
     try {
-      const imageUrl = urlForImage(image);
-      console.log('Generated image URL:', imageUrl);
+      // Check if we have a direct URL from the asset
+      if ('url' in image.asset && typeof image.asset.url === 'string') {
+        const url = image.asset.url;
+        console.log('Using direct URL:', url);
+        return url;
+      }
 
-      // Verify the URL structure
-      if (imageUrl && !imageUrl.includes('cdn.sanity.io')) {
-        console.warn('Invalid Sanity URL generated:', imageUrl);
+      // Fallback to using urlForImage if no direct URL
+      const sanityImage: SanityImageSource = {
+        _type: 'image',
+        asset: {
+          _ref: image.asset._ref,
+          _type: 'reference'
+        }
+      };
+      
+      console.log('Sanity image object:', sanityImage);
+      const imageUrl = urlForImage(sanityImage);
+      console.log('Generated URL:', imageUrl);
+      
+      if (!imageUrl) {
+        console.log('No URL generated');
         return null;
       }
 
@@ -167,6 +181,13 @@ export default function DayByDayItinerary({ itinerary }: DayByDayItineraryProps)
             expandedUrl
           });
           
+          console.log(`Day ${day.day} image data:`, {
+            thumbnailImage: day.thumbnailImage,
+            expandedImage: day.expandedImage,
+            thumbnailUrl,
+            expandedUrl
+          });
+          
           return (
             <div 
               key={index} 
@@ -180,20 +201,18 @@ export default function DayByDayItinerary({ itinerary }: DayByDayItineraryProps)
               >
                 {/* Thumbnail Image */}
                 <div className="w-52 h-45 relative flex-shrink-0 bg-gray-100">
-                  {thumbnailUrl ? (
+                  {thumbnailUrl && (
                     <Image
                       src={thumbnailUrl}
                       alt={day.thumbnailImage?.alt || `Day ${day.day} - ${day.title}`}
                       fill
                       className="object-cover"
                       sizes="(max-width: 768px) 100vw, 192px"
-                      onError={() => {
-                        console.error(`Error loading thumbnail for day ${day.day}`);
-                        handleImageError(thumbnailId);
-                      }}
+                      onError={() => handleImageError(thumbnailId)}
                       priority={index < 3}
                     />
-                  ) : (
+                  )}
+                  {!thumbnailUrl && (
                     <div className="w-full h-full flex items-center justify-center">
                       <span className="text-gray-400 text-sm">No image</span>
                     </div>
@@ -357,16 +376,24 @@ export default function DayByDayItinerary({ itinerary }: DayByDayItineraryProps)
                                 <div className="flex gap-6">
                                   {/* Activity Image */}
                                   <div className="w-48 h-32 relative flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden">
-                                    {activity.image ? (
-                                      <Image
-                                        src={getImageUrl(activity.image) || ''}
-                                        alt={activity.image.alt || activity.type}
-                                        fill
-                                        className="object-cover"
-                                        sizes="(max-width: 768px) 100vw, 192px"
-                                        onError={() => handleImageError(`activity-${actIndex}`)}
-                                      />
-                                    ) : (
+                                    {activity.image && (() => {
+                                      const imageUrl = getImageUrl(activity.image);
+                                      return imageUrl ? (
+                                        <Image
+                                          src={imageUrl}
+                                          alt={activity.image.alt || activity.type}
+                                          fill
+                                          className="object-cover"
+                                          sizes="(max-width: 768px) 100vw, 192px"
+                                          onError={() => handleImageError(`activity-${actIndex}`)}
+                                        />
+                                      ) : (
+                                        <div className="absolute inset-0 flex items-center justify-center">
+                                          <span className="text-gray-400 text-sm">No image</span>
+                                        </div>
+                                      );
+                                    })()}
+                                    {!activity.image && (
                                       <div className="absolute inset-0 flex items-center justify-center">
                                         <span className="text-gray-400 text-sm">No image</span>
                                       </div>
@@ -393,16 +420,24 @@ export default function DayByDayItinerary({ itinerary }: DayByDayItineraryProps)
                                 <div className="flex gap-6">
                                   {/* Experience Image */}
                                   <div className="w-48 h-32 relative flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden">
-                                    {exp.image ? (
-                                      <Image
-                                        src={getImageUrl(exp.image) || ''}
-                                        alt={exp.image.alt || exp.title}
-                                        fill
-                                        className="object-cover"
-                                        sizes="(max-width: 768px) 100vw, 192px"
-                                        onError={() => handleImageError(`optional-${expIndex}`)}
-                                      />
-                                    ) : (
+                                    {exp.image && (() => {
+                                      const imageUrl = getImageUrl(exp.image);
+                                      return imageUrl ? (
+                                        <Image
+                                          src={imageUrl}
+                                          alt={exp.image.alt || exp.title}
+                                          fill
+                                          className="object-cover"
+                                          sizes="(max-width: 768px) 100vw, 192px"
+                                          onError={() => handleImageError(`optional-${expIndex}`)}
+                                        />
+                                      ) : (
+                                        <div className="absolute inset-0 flex items-center justify-center">
+                                          <span className="text-gray-400 text-sm">No image</span>
+                                        </div>
+                                      );
+                                    })()}
+                                    {!exp.image && (
                                       <div className="absolute inset-0 flex items-center justify-center">
                                         <span className="text-gray-400 text-sm">No image</span>
                                       </div>
@@ -438,25 +473,24 @@ export default function DayByDayItinerary({ itinerary }: DayByDayItineraryProps)
                     {/* Right Column - Image */}
                     <div className="col-span-5">
                       <div className="relative aspect-[4/3] bg-gray-100 rounded-lg overflow-hidden">
-                        {(expandedUrl && !imageLoadError[expandedId]) ? (
-                          <Image
-                            src={expandedUrl}
-                            alt={day.expandedImage?.alt || `Day ${day.day} - ${day.title}`}
-                            fill
-                            className="object-cover"
-                            sizes="(max-width: 768px) 100vw, 400px"
-                            onError={() => handleImageError(expandedId)}
-                          />
-                        ) : (thumbnailUrl && !imageLoadError[thumbnailId]) ? (
-                          <Image
-                            src={thumbnailUrl}
-                            alt={day.thumbnailImage?.alt || `Day ${day.day} - ${day.title}`}
-                            fill
-                            className="object-cover"
-                            sizes="(max-width: 768px) 100vw, 400px"
-                            onError={() => handleImageError(thumbnailId)}
-                          />
-                        ) : (
+                        {day.expandedImage && (() => {
+                          const imageUrl = getImageUrl(day.expandedImage);
+                          return imageUrl && !imageLoadError[expandedId] ? (
+                            <Image
+                              src={imageUrl}
+                              alt={day.expandedImage.alt || `Day ${day.day} - ${day.title}`}
+                              fill
+                              className="object-cover"
+                              sizes="(max-width: 768px) 100vw, 400px"
+                              onError={() => handleImageError(expandedId)}
+                            />
+                          ) : (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <span className="text-gray-400 text-sm">No image available</span>
+                            </div>
+                          );
+                        })()}
+                        {!day.expandedImage && (
                           <div className="absolute inset-0 flex items-center justify-center">
                             <span className="text-gray-400 text-sm">No image available</span>
                           </div>

@@ -1,29 +1,27 @@
 import { type SanityDocument } from "next-sanity";
-import { Metadata, ResolvingMetadata } from "next";
+import { Metadata } from "next";
 import Image from "next/image";
+import Link from 'next/link';
 import { client } from "@/sanity/client";
 import { urlForImage } from "@/lib/sanity.image";
-import TourSummary from "@/components/tours/TourSummary";
 import DayByDayItinerary from "@/components/tours/DayByDayItinerary";
-import SightseeingHighlights from "@/components/tours/SightseeingHighlights";
-import TravelHighlights from "@/components/tours/TravelHighlights";
 import FAQ from "@/components/tours/FAQ";
-import TravelStyle from "@/components/tours/TravelStyle";
 import DepartureDates from "@/components/tours/DepartureDates";
 import IncludedItems from "@/components/tours/IncludedItems";
 import AboutThisTrip from "@/components/tours/AboutThisTrip";
 
-type Props = {
-  params: { slug: string };
-  searchParams?: Record<string, string | string[] | undefined>;
+type PageParams = {
+  params: Promise<{ slug: string }>;
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 export async function generateMetadata(
-  { params }: Props
+  { params }: PageParams
 ): Promise<Metadata> {
+  const resolvedParams = await params;
   const tour = await client.fetch<SanityDocument>(
     `*[_type == "tour" && slug.current == $slug][0]{ title, summary }`,
-    { slug: params.slug }
+    { slug: resolvedParams.slug }
   );
 
   return {
@@ -138,7 +136,7 @@ const TOUR_QUERY = `*[_type == "tour" && slug.current == $slug][0]{
   }
 }`;
 
-export async function generateStaticParams() {
+export async function generateStaticParams(): Promise<Array<{ slug: string }>> {
   const tours = await client.fetch<SanityDocument[]>(
     `*[_type == "tour"]{ "slug": slug.current }`
   );
@@ -148,19 +146,18 @@ export async function generateStaticParams() {
   }));
 }
 
-export default async function TourPage({ params }: Props) {
-  const { slug } = params;
-  
-  const tour = await client.fetch<SanityDocument>(TOUR_QUERY, { slug });
+export default async function Page({ params }: PageParams) {
+  const resolvedParams = await params;
+  const tour = await client.fetch<SanityDocument>(TOUR_QUERY, { slug: resolvedParams.slug });
 
   if (!tour) {
     return (
       <div className="container mx-auto px-4 py-16 text-center">
         <h1 className="text-2xl font-bold text-gray-900">Tour not found</h1>
-        <p className="mt-2 text-gray-600">The tour you're looking for doesn't exist or has been removed.</p>
-        <a href="/" className="mt-4 inline-block text-red-600 hover:text-red-700">
+        <p className="mt-2 text-gray-600">The tour you&apos;re looking for doesn&apos;t exist or has been removed.</p>
+        <Link href="/" className="mt-4 inline-block text-red-600 hover:text-red-700">
           ← Back to all tours
-        </a>
+        </Link>
       </div>
     );
   }
@@ -181,16 +178,17 @@ export default async function TourPage({ params }: Props) {
           <div className="grid grid-cols-1 lg:grid-cols-2">
             {/* Hero Image */}
             <div className="relative h-[50vh] lg:h-[85vh] xl:h-[90vh]">
-              {imageUrl ? (
+              {imageUrl && (
                 <Image
                   src={imageUrl}
-                  alt={tour.title}
+                  alt={tour.title || 'Tour image'}
                   fill
                   className="object-cover"
                   priority
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 50vw"
                 />
-              ) : (
+              )}
+              {!imageUrl && (
                 <div className="w-full h-full bg-gray-100 flex items-center justify-center">
                   <span className="text-gray-400">No image available</span>
                 </div>

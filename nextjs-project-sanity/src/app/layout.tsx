@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import Link from 'next/link';
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -17,33 +18,26 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className} suppressHydrationWarning>
-        <div className="min-h-screen bg-gray-50">
-          <header className="bg-white shadow-sm">
-            <nav className="container mx-auto px-4 py-4">
-              <div className="flex justify-between items-center">
-                <a href="/" className="text-2xl font-bold text-red-600">
-                  Travel Tours
-                </a>
-                <div className="space-x-4">
-                  <a href="/" className="text-gray-600 hover:text-gray-900">
+        <header className="bg-white shadow-sm">
+          <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between h-16">
+              <div className="flex">
+                <Link href="/" className="flex-shrink-0 flex items-center">
+                  Logo
+                </Link>
+                <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
+                  <Link href="/" className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                     Home
-                  </a>
-                  <a href="/tours" className="text-gray-600 hover:text-gray-900">
+                  </Link>
+                  <Link href="/tours" className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
                     Tours
-                  </a>
+                  </Link>
                 </div>
               </div>
-            </nav>
-          </header>
-          {children}
-          <footer className="bg-gray-800 text-white py-8">
-            <div className="container mx-auto px-4">
-              <div className="text-center">
-                <p>© {new Date().getFullYear()} Travel Tours. All rights reserved.</p>
-              </div>
             </div>
-          </footer>
-        </div>
+          </nav>
+        </header>
+        <main>{children}</main>
       </body>
     </html>
   );

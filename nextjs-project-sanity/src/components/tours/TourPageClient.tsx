@@ -82,7 +82,7 @@ export default function TourPageClient({ tour, imageUrl }: TourPageClientProps) 
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              Dates & Prices
+              Dates &amp; Prices
               {selectedTab === 'dates-prices' && (
                 <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-red-600"></div>
               )}
@@ -126,7 +126,7 @@ export default function TourPageClient({ tour, imageUrl }: TourPageClientProps) 
               <>
                 {/* Trip Map */}
                 <section className="mb-12">
-                  <h2 className="text-2xl font-bold mb-6">Trip Map & Itinerary</h2>
+                  <h2 className="text-2xl font-bold mb-6">Trip Map &amp; Itinerary</h2>
                   <div className="bg-gray-100 rounded-lg p-4 h-[400px] relative">
                     <div className="absolute inset-0 flex items-center justify-center">
                       <Image
@@ -164,7 +164,7 @@ export default function TourPageClient({ tour, imageUrl }: TourPageClientProps) 
                   <h2 className="text-2xl font-bold mb-6">Trip Details</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                      <h3 className="font-semibold mb-2">What's Included</h3>
+                      <h3 className="font-semibold mb-2">What&apos;s Included</h3>
                       <ul className="space-y-2">
                         <li className="flex items-center gap-2">
                           <span className="text-green-500">✓</span>

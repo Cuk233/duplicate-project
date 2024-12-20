@@ -1,5 +1,3 @@
-import { type SanityDocument } from "next-sanity";
-
 interface TripStyle {
   name: string;
   description: string;

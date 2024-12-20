@@ -1,4 +1,3 @@
-import { type SanityDocument } from "next-sanity";
 
 interface DepartureDate {
   date: string;
@@ -7,7 +6,11 @@ interface DepartureDate {
 }
 
 interface DepartureDatesProps {
-  departureDates: DepartureDate[];
+  departureDates?: {
+    date: string;
+    price: number;
+    availability: string;
+  }[];
   currency: string;
 }
 
