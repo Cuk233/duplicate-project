@@ -143,29 +143,34 @@ export default function FAQ({ questions = [] }: FAQProps) {
           text-align: left;
           font-size: 1rem;
           font-weight: 500;
-          color: #111827;
+          color: #000000;
           cursor: pointer;
           transition: all 0.2s ease;
         }
 
+        .faq-item .faq-question {
+          background: white;
+          color: #000000;
+        }
+
         .faq-item.active .faq-question {
-          background: #F9FAFB;
-          color: #DC2626;
+          background: #2d5a7b;
+          color: white;
         }
 
         .faq-question:hover {
-          background: #F9FAFB;
+          background: #f8fafc;
         }
 
         .icon {
           font-size: 1.5rem;
           font-weight: 300;
-          color: #6B7280;
+          color: #000000;
           transition: transform 0.2s ease;
         }
 
         .faq-item.active .icon {
-          color: #DC2626;
+          color: white;
         }
 
         .faq-answer {
@@ -180,10 +185,10 @@ export default function FAQ({ questions = [] }: FAQProps) {
         }
 
         .faq-answer-content {
-          padding: 0 1.25rem 1.25rem;
+          padding: 1.25rem;
           color: #4B5563;
           line-height: 1.6;
-          background: #F9FAFB;
+          background: white;
         }
       `}</style>
     </div>

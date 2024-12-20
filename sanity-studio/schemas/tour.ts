@@ -1,33 +1,24 @@
 import {defineField, defineType} from 'sanity'
 
+/**
+ * Tour Schema
+ * Defines the structure for tour content in the CMS
+ */
 export default defineType({
   name: 'tour',
   title: 'Tours',
   type: 'document',
+  
+  // Organize fields into logical groups for better content management
   groups: [
-    {
-      name: 'basic',
-      title: 'Basic Information',
-    },
-    {
-      name: 'details',
-      title: 'Tour Details',
-    },
-    {
-      name: 'itinerary',
-      title: 'Itinerary',
-    },
-    {
-      name: 'pricing',
-      title: 'Pricing & Dates',
-    },
-    {
-      name: 'media',
-      title: 'Media & Gallery',
-    },
+    { name: 'basic', title: 'Basic Information' },
+    { name: 'details', title: 'Tour Details' },
+    { name: 'itinerary', title: 'Itinerary' },
+    { name: 'pricing', title: 'Pricing & Dates' }
   ],
+
   fields: [
-    // Basic Information
+    // ====== Basic Information ======
     defineField({
       name: 'title',
       title: 'Title',
@@ -66,7 +57,7 @@ export default defineType({
       name: 'mainImage',
       title: 'Main Image',
       type: 'image',
-      group: 'media',
+      group: 'basic',
       options: {
         hotspot: true,
       },
@@ -75,32 +66,6 @@ export default defineType({
           name: 'alt',
           type: 'string',
           title: 'Alternative Text',
-        }
-      ]
-    }),
-    defineField({
-      name: 'gallery',
-      title: 'Gallery',
-      type: 'array',
-      group: 'media',
-      of: [
-        {
-          type: 'image',
-          options: {
-            hotspot: true,
-          },
-          fields: [
-            {
-              name: 'alt',
-              type: 'string',
-              title: 'Alternative Text',
-            },
-            {
-              name: 'caption',
-              type: 'string',
-              title: 'Caption',
-            }
-          ]
         }
       ]
     }),
@@ -574,6 +539,11 @@ export default defineType({
       type: 'array',
       of: [{type: 'string'}],
     }),
+    /**
+     * Sightseeing Highlights
+     * Displays key attractions and places visited during the tour
+     * Shows as a single column list with location markers
+     */
     defineField({
       name: 'sightseeingHighlights',
       title: 'Sightseeing Highlights',
@@ -587,25 +557,25 @@ export default defineType({
               name: 'title',
               title: 'Title',
               type: 'string',
+              description: 'Action words like "Fast-Track", "Explore", "Discover", "Visit", "View", "See", "Scenic Cruise"',
               validation: (Rule) => Rule.required(),
             },
             {
               name: 'description',
               title: 'Description',
               type: 'text',
-              validation: (Rule) => Rule.required(),
-            },
-            {
-              name: 'locations',
-              title: 'Locations',
-              type: 'array',
-              of: [{type: 'string'}],
+              description: 'The destination or attraction, e.g., "to the Vatican Museums", "Rome, Pompeii, Capri"',
               validation: (Rule) => Rule.required(),
             }
           ]
         }
       ]
     }),
+    /**
+     * Travel Highlights
+     * Showcases the key features and services of the tour
+     * Displays in a two-column grid with icons
+     */
     defineField({
       name: 'travelHighlights',
       title: 'Travel Highlights',
@@ -619,18 +589,21 @@ export default defineType({
               name: 'title',
               title: 'Title',
               type: 'string',
+              description: 'The main feature or service title',
               validation: (Rule) => Rule.required(),
             },
             {
               name: 'description',
               title: 'Description',
               type: 'text',
+              description: 'Detailed explanation of the feature or service',
               validation: (Rule) => Rule.required(),
             },
             {
               name: 'icon',
               title: 'Icon',
               type: 'string',
+              description: 'Select an icon that best represents this highlight',
               options: {
                 list: [
                   { title: 'Expert Guide', value: 'guide' },
@@ -639,7 +612,8 @@ export default defineType({
                   { title: 'Meals', value: 'meals' },
                   { title: 'Experiences', value: 'experiences' }
                 ]
-              }
+              },
+              validation: (Rule) => Rule.required(),
             }
           ]
         }

@@ -131,7 +131,7 @@ export default function DayByDayItinerary({ itinerary }: DayByDayItineraryProps)
   };
 
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className="max-w-7x1 mx-auto">
       {/* Map Section */}
       <div className="mb-8">
         <div className="relative h-[400px] w-full bg-gray-100 rounded-lg overflow-hidden">
@@ -179,7 +179,7 @@ export default function DayByDayItinerary({ itinerary }: DayByDayItineraryProps)
                 onClick={() => handleExpand(day.day)}
               >
                 {/* Thumbnail Image */}
-                <div className="w-48 h-32 relative flex-shrink-0 bg-gray-100">
+                <div className="w-52 h-45 relative flex-shrink-0 bg-gray-100">
                   {thumbnailUrl ? (
                     <Image
                       src={thumbnailUrl}

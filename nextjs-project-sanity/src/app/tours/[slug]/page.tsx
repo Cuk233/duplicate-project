@@ -333,7 +333,7 @@ export default async function TourPage({ params }: TourPageProps) {
             <div className="text-center">
               <div className="mb-4">
                 <Image
-                  src="/images/sustainable-travel.jpg"
+                  src="/images/sustainable-travel.webp"
                   alt="Sustainable Travel"
                   width={300}
                   height={200}
@@ -346,7 +346,7 @@ export default async function TourPage({ params }: TourPageProps) {
             <div className="text-center">
               <div className="mb-4">
                 <Image
-                  src="/images/local-experiences.jpg"
+                  src="/images/local-experiences.webp"
                   alt="Local Experiences"
                   width={300}
                   height={200}
@@ -359,7 +359,7 @@ export default async function TourPage({ params }: TourPageProps) {
             <div className="text-center">
               <div className="mb-4">
                 <Image
-                  src="/images/responsible-tourism.jpg"
+                  src="/images/responsible-tourism.webp"
                   alt="Responsible Tourism"
                   width={300}
                   height={200}
