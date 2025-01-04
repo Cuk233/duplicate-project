@@ -34,3 +34,15 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Hero Image
+
+The homepage requires a hero image to be placed at `/public/hero-image.jpg`. This should be a high-quality landscape image (recommended size: 1920x1080px) that represents travel and adventure. The image should be:
+
+1. High resolution and visually appealing
+2. Landscape oriented
+3. Showing a beautiful travel destination
+4. Not too busy or cluttered
+5. Dark enough to support white text overlay
+
+You can replace the default hero image with your own by placing it in the `public` directory with the name `hero-image.jpg`.

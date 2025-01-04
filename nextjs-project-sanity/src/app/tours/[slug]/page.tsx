@@ -15,6 +15,11 @@ type PageParams = {
   searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
+interface FAQ {
+  question: string;
+  answer: string;
+}
+
 export async function generateMetadata(
   { params }: PageParams
 ): Promise<Metadata> {
@@ -60,6 +65,18 @@ const TOUR_QUERY = `*[_type == "tour" && slug.current == $slug][0]{
   },
   locations,
   summary,
+  includedItems[],
+  excludedItems[],
+  departureDates[] {
+    date,
+    price,
+    availability,
+    discounts[] {
+      type,
+      amount,
+      description
+    }
+  },
   itinerary[] {
     day,
     title,
@@ -149,6 +166,7 @@ export async function generateStaticParams(): Promise<Array<{ slug: string }>> {
 export default async function Page({ params }: PageParams) {
   const resolvedParams = await params;
   const tour = await client.fetch<SanityDocument>(TOUR_QUERY, { slug: resolvedParams.slug });
+  console.log(tour);
 
   if (!tour) {
     return (
@@ -163,12 +181,6 @@ export default async function Page({ params }: PageParams) {
   }
 
   const imageUrl = tour.mainImage ? urlForImage(tour.mainImage) : null;
-
-  const tripStyle = tour.tripStyle ? {
-    name: tour.tripStyle.name || '',
-    description: tour.tripStyle.description || '',
-    features: tour.tripStyle.features || []
-  } : null;
 
   return (
     <div className="min-h-screen">
@@ -248,170 +260,75 @@ export default async function Page({ params }: PageParams) {
                     </svg>
                     Trip Style
                   </h3>
-                  <p className="text-gray-600">{tripStyle?.name || 'Standard Tour'}</p>
-                </div>
-              </div>
-
-              {/* Price & Booking */}
-              <div className="bg-gray-50 p-6 rounded-lg mb-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <p className="text-gray-600">From</p>
-                    <p className="text-2xl lg:text-3xl font-bold">
-                      {tour.price.currency} {tour.price.amount.toLocaleString()}
-                    </p>
-                    <p className="text-sm text-gray-600">{tour.price.priceType}</p>
-                    {tour.rating && (
-                      <div className="flex items-center gap-2 mt-2">
-                        <div className="flex text-yellow-400">
-                          {[...Array(5)].map((_, i) => (
-                            <span key={i} className={i < Math.floor(tour.rating.score) ? 'text-yellow-400' : 'text-gray-300'}>★</span>
-                          ))}
-                        </div>
-                        <span className="text-sm text-gray-600">{tour.rating.score.toFixed(1)}/5 ({tour.rating.reviewCount} reviews)</span>
-                      </div>
-                    )}
+                  <div className="space-y-2">
+                    <p className="text-gray-600">{tour.tripStyle?.name}</p>
+                    {tour.tripStyle?.features?.map((feature: string, index: number) => (
+                      <p key={index} className="text-gray-600">{feature}</p>
+                    ))}
                   </div>
-                  <button className="bg-red-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors">
-                    Book Now
-                  </button>
                 </div>
-                <p className="text-sm text-gray-500">
-                  *Prices may vary based on departure date and room type
-                </p>
-              </div>
-
-              {/* Trip Code */}
-              <div className="text-sm text-gray-500">
-                Trip code: {tour.tripCode}
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 py-8 lg:py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column - Main Content */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Travel Style */}
-            {/* {tripStyle && <TravelStyle travelStyle={tripStyle} />} */}
-
-            
-
-            {/* Map & Itinerary */}
-            <section id="itinerary" className="bg-white rounded-lg p-6 shadow-sm">
-              <h2 className="text-2xl font-bold mb-6">Day by day itinerary</h2>
+      {/* Main Content with Sidebar */}
+      <div className="container mx-auto px-4 py-12">
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Main Content */}
+          <div className="lg:w-2/3">
+            {/* Day by Day Itinerary */}
+            <section className="mb-12">
+              <h2 className="text-2xl font-bold mb-6">Day by Day Itinerary</h2>
               <DayByDayItinerary itinerary={tour.itinerary} />
             </section>
 
-            {/* What's Included */}
-            <IncludedItems included={tour.included} notIncluded={tour.notIncluded} />
-            {/* About This Trip */}
-            <section className="bg-white rounded-lg p-6 shadow-sm">
+            {/* About this Trip */}
+            <section className="mb-12">
               <AboutThisTrip 
                 sightseeingHighlights={tour.sightseeingHighlights}
                 travelHighlights={tour.travelHighlights}
               />
             </section>
-            {/* FAQs */}
-            <section className="bg-white rounded-lg p-6 shadow-sm">
-              <h2 className="text-2xl font-bold mb-6">Frequently Asked Questions</h2>
-              <FAQ questions={tour.faqs} />
+
+            {/* Included Items Section */}
+            <section className="mb-12">
+              <IncludedItems 
+                includedItems={tour.includedItems}
+                excludedItems={tour.excludedItems}
+              />
+            </section>
+
+            {/* FAQ Section */}
+            <section className="mb-12">
+              <FAQ questions={tour.faqs as FAQ[]} />
             </section>
           </div>
 
-          {/* Right Column - Sidebar */}
-          <div className="space-y-2">
-            <div className="sticky top-8">
-              <DepartureDates 
-                departureDates={tour.departureDates} 
-                currency={tour.price.currency} 
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Travel Matter Section */}
-      <div className="bg-emerald-900 text-white py-16">
-        <div className="container mx-auto px-4">
-          <h2 className="text-center text-3xl font-bold mb-12">WE MAKE TRAVEL MATTER®</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="mb-4">
-                <Image
-                  src="/images/sustainable-travel.webp"
-                  alt="Sustainable Travel"
-                  width={300}
-                  height={200}
-                  className="rounded-lg mx-auto"
-                />
-              </div>
-              <h3 className="font-semibold mb-2">Sustainable Travel</h3>
-              <p className="text-sm">Supporting initiatives that protect our planet and communities.</p>
-            </div>
-            <div className="text-center">
-              <div className="mb-4">
-                <Image
-                  src="/images/local-experiences.webp"
-                  alt="Local Experiences"
-                  width={300}
-                  height={200}
-                  className="rounded-lg mx-auto"
-                />
-              </div>
-              <h3 className="font-semibold mb-2">Local Experiences</h3>
-              <p className="text-sm">Connecting you with local communities and cultures.</p>
-            </div>
-            <div className="text-center">
-              <div className="mb-4">
-                <Image
-                  src="/images/responsible-tourism.webp"
-                  alt="Responsible Tourism"
-                  width={300}
-                  height={200}
-                  className="rounded-lg mx-auto"
-                />
-              </div>
-              <h3 className="font-semibold mb-2">Responsible Tourism</h3>
-              <p className="text-sm">Preserving the places we visit for future generations.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Reviews Section */}
-      <div className="bg-gray-50 py-16">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="text-center text-3xl font-bold mb-12">Guest Reviews</h2>
-            {tour.rating ? (
-              <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <div className="flex text-yellow-400 mb-2">
-                      {[...Array(5)].map((_, i) => (
-                        <span key={i} className={i < Math.floor(tour.rating.score) ? 'text-yellow-400' : 'text-gray-300'}>★</span>
-                      ))}
-                    </div>
-                    <h3 className="font-semibold">{tour.rating.score.toFixed(1)} / 5</h3>
-                    <p className="text-sm text-gray-600">Based on {tour.rating.reviewCount} reviews</p>
+          {/* Sidebar */}
+          <div className="lg:w-1/3">
+            <div className="sticky top-8 space-y-6">
+              {/* Price Overview */}
+              <div className="bg-white rounded-lg p-6 shadow-sm">
+                <div className="mb-4">
+                  <span className="text-sm text-gray-600">From</span>
+                  <div className="text-3xl font-bold text-gray-900">
+                    {tour.price?.currency} {tour.price?.amount?.toLocaleString()}
                   </div>
-                  <button className="bg-red-600 text-white py-2 px-6 rounded-lg hover:bg-red-700 transition duration-200">
-                    Write a Review
-                  </button>
+                  <span className="text-sm text-gray-600">per person</span>
                 </div>
-              </div>
-            ) : (
-              <div className="bg-white rounded-lg shadow-lg p-6 mb-8 text-center">
-                <p className="text-gray-600">No reviews yet</p>
-                <button className="mt-4 bg-red-600 text-white py-2 px-6 rounded-lg hover:bg-red-700 transition duration-200">
-                  Be the First to Review
+                <button className="w-full bg-red-600 text-white py-3 px-6 rounded-lg font-semibold hover:bg-red-700 transition-colors">
+                  Check Available Dates
                 </button>
               </div>
-            )}
+
+              {/* Departure Dates */}
+              <DepartureDates 
+                departureDates={tour.departureDates} 
+                currency={tour.price?.currency}
+              />
+            </div>
           </div>
         </div>
       </div>

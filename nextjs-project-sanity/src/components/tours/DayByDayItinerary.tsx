@@ -146,23 +146,8 @@ export default function DayByDayItinerary({ itinerary }: DayByDayItineraryProps)
 
   return (
     <div className="max-w-7x1 mx-auto">
-      {/* Map Section */}
-      <div className="mb-8">
-        <div className="relative h-[400px] w-full bg-gray-100 rounded-lg overflow-hidden">
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="text-center">
-              <svg className="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-              </svg>
-              <p className="text-gray-500">Interactive map coming soon</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Trip Itinerary List */}
       <div className="space-y-4">
-        <h2 className="text-xl font-semibold mb-6">Day by day itinerary</h2>
         
         {itinerary.map((day, index) => {
           console.log(`Processing day ${day.day}:`, {
@@ -260,7 +245,14 @@ export default function DayByDayItinerary({ itinerary }: DayByDayItineraryProps)
 
                     {/* Special Feature Badge */}
                     {day.specialFeature && (
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                      <span className="hidden md:inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                        {day.specialFeature}
+                      </span>
+                    )}
+
+                    {/* Mobile Special Feature Badge */}
+                    {day.specialFeature && (
+                      <span className="md:hidden inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
                         {day.specialFeature}
                       </span>
                     )}
