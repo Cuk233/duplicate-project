@@ -4,8 +4,9 @@
  */
 
 import tour from './tour'
+import homepage from './homepage'
 
 // Add all schema types here
-const schemas = [tour]
+const schemas = [tour, homepage]
 
 export default schemas 

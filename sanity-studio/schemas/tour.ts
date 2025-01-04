@@ -38,6 +38,14 @@ export default defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
+      name: 'featured',
+      title: 'Featured Tour',
+      type: 'boolean',
+      group: 'basic',
+      description: 'Set to true to display this tour in the featured section on the homepage',
+      initialValue: false,
+    }),
+    defineField({
       name: 'tripCode',
       title: 'Trip Code',
       type: 'string',
@@ -152,6 +160,43 @@ export default defineType({
           type: 'text',
         }
       ]
+    }),
+    // Included Items
+    defineField({
+      name: 'includedItems',
+      title: 'Included Items',
+      type: 'array',
+      group: 'details',
+      of: [{
+        type: 'object',
+        fields: [
+          {
+            name: 'category',
+            title: 'Category',
+            type: 'string',
+            description: 'Category name (e.g., Transportation, Accommodation, Meals)',
+            options: {
+              list: ['Transportation', 'Accommodation', 'Meals', 'Experiences', 'Services'],
+            },
+          },
+          {
+            name: 'items',
+            title: 'Items',
+            type: 'array',
+            of: [{type: 'string'}],
+            description: 'List of items in this category',
+          }
+        ]
+      }],
+      description: 'List of items included in the tour package, organized by category',
+    }),
+    defineField({
+      name: 'excludedItems',
+      title: 'Not Included Items',
+      type: 'array',
+      group: 'details',
+      of: [{type: 'string'}],
+      description: 'List of items not included in the tour package',
     }),
     // Pricing & Dates
     defineField({
@@ -505,39 +550,6 @@ export default defineType({
           ]
         }
       ]
-    }),
-    // Additional Information
-    defineField({
-      name: 'included',
-      title: 'What\'s Included',
-      type: 'array',
-      of: [
-        {
-          type: 'object',
-          fields: [
-            {
-              name: 'category',
-              title: 'Category',
-              type: 'string',
-              options: {
-                list: ['Accommodation', 'Transportation', 'Meals', 'Experiences', 'Services'],
-              },
-            },
-            {
-              name: 'items',
-              title: 'Items',
-              type: 'array',
-              of: [{type: 'string'}],
-            },
-          ],
-        },
-      ],
-    }),
-    defineField({
-      name: 'notIncluded',
-      title: 'Not Included',
-      type: 'array',
-      of: [{type: 'string'}],
     }),
     /**
      * Sightseeing Highlights
