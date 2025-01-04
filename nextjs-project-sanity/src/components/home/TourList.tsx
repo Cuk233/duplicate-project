@@ -8,6 +8,7 @@ import { urlForImage } from "@/lib/sanity.image";
 interface TourListProps {
   title: string;
   subtitle: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   tours: any[];
   cardWidth: number;
 }

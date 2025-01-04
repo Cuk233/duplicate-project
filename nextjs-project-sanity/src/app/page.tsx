@@ -43,14 +43,14 @@ export default async function HomePage() {
       {/* Hero Section */}
       <section className="relative h-[80vh] min-h-[600px] flex items-center justify-center">
         <div className="absolute inset-0 z-0">
-          <Image
+                    <Image
             src={heroImageUrl}
             alt={homepage?.heroImage?.alt || "Beautiful travel destination"}
-            fill
+                      fill
             className="object-cover brightness-50"
             priority
-          />
-        </div>
+                    />
+                  </div>
         <div className="relative z-10 text-center text-white px-4 max-w-4xl mx-auto">
           <h1 className="text-5xl md:text-6xl font-bold mb-6">
             {homepage?.heroTitle || "Discover Your Next Adventure"}
@@ -64,7 +64,7 @@ export default async function HomePage() {
           >
             {homepage?.heroButton?.text || "Explore Tours"}
           </Link>
-        </div>
+                  </div>
       </section>
 
       {/* Featured Tours Section */}
@@ -137,10 +137,10 @@ export default async function HomePage() {
                 <p className="text-gray-600">
                   {benefit.description}
                 </p>
-              </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
+      </div>
       </section>
     </main>
   );
